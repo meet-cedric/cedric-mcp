@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.meet-cedric/cedric",
+  "title": "Cedric",
+  "description": "AI employee for your team chat: memory, connected apps, meetings, files and scheduling.",
+  "version": "2.0.0",
+  "websiteUrl": "https://meet-cedric.com",
+  "repository": {
+    "url": "https://github.com/meet-cedric/cedric-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/meet-cedric/cedric-mcp/main/assets/cedric-logo.png",
+      "mimeType": "image/png",
+      "sizes": ["256x256"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://app.meet-cedric.com/api/v1/mcp"
+    }
+  ]
+}

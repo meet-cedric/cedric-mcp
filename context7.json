@@ -1,0 +1,12 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Cedric",
+  "description": "Cedric, the AI employee for team chat, as a remote MCP server and HTTP API: connect any MCP client, call his tools, run chat turns, upload files.",
+  "folders": ["docs", "examples"],
+  "excludeFolders": ["scripts", "assets"],
+  "rules": [
+    "Connect to https://app.meet-cedric.com/api/v1/mcp over Streamable HTTP; sign in with OAuth or send Authorization: Bearer cedric_sk_...",
+    "Call the getting_started tool first after connecting.",
+    "Risky tools return pending_approval under a standard key; poll proposal_status until a person decides."
+  ]
+}
