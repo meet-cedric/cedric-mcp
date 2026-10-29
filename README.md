@@ -9,19 +9,20 @@
   <a href="https://meet-cedric.com">Website</a> ·
   <a href="docs/clients.md">Connect a client</a> ·
   <a href="docs/tools.md">Tools</a> ·
+  <a href="docs/use-cases.md">Use cases</a> ·
   <a href="docs/api.md">API</a> ·
   <a href="https://app.meet-cedric.com">Start free</a>
 </p>
 
 [Cedric](https://meet-cedric.com) is an AI employee for Slack, Telegram and Discord. He joins your meetings, works in the tools you connect (HubSpot, Notion, Gmail, Google Calendar, Linear, GitHub, Stripe and 3,000+ more) and asks before anything is sent or changed.
 
-This repo is how you reach him from code. Cedric is a remote MCP server, so Claude Code, Cursor, VS Code, Claude, ChatGPT, Codex CLI, Gemini CLI, Windsurf or your own agent can use his 130+ tools: team memory, channels, connected apps, meetings, files, workflows and scheduling. Your agent is the brain; Cedric is the hands.
+This repo is how you reach him from code. Cedric is a remote MCP server, so Claude Code, Cursor, VS Code, Claude, ChatGPT, Codex CLI, Gemini CLI, Windsurf or your own agent can use his 129 tools: team memory, channels, connected apps, meetings, files, workflows and scheduling. Your agent is the brain; Cedric is the hands.
 
 | | |
 | --- | --- |
 | **Endpoint** | `https://app.meet-cedric.com/api/v1/mcp` |
 | **Transport** | Streamable HTTP |
-| **Auth** | OAuth 2.1 with PKCE (sign in once in the browser), or an API key `cedric_sk_...` |
+| **Auth** | Either way works: sign in once in the browser (OAuth 2.1 with PKCE, nothing to paste), or send an API key `cedric_sk_...` |
 | **Account** | Free to start, no card: [app.meet-cedric.com](https://app.meet-cedric.com) |
 
 ## Quick start
@@ -55,7 +56,7 @@ Once connected, call the `getting_started` tool. It returns the full guide, incl
 
 ## What your agent can do with Cedric
 
-A few of the [134 tools](docs/tools.md):
+A few of the [129 tools](docs/tools.md):
 
 | Area | Tools |
 | --- | --- |
@@ -65,10 +66,24 @@ A few of the [134 tools](docs/tools.md):
 | Connected apps | `list_connectors`, `integration_request`, `run_recipe` |
 | Email and calendar | `gmail_search`, `gmail_send`, `calendar_free_busy`, `calendar_create_event` |
 | Meetings | `join_call`, `share_meeting_notes`, `meeting_brief` |
-| Schedules and workflows | `schedule_task`, `start_workflow`, `watch_app`, `create_event_hook` |
+| Schedules and workflows | `schedule_task`, `start_workflow`, `watch_app`, `watch_source` |
 | Files and documents | `upload_file`, `read_file`, `create_document`, `create_presentation`, `create_spreadsheet` |
 
-Anything risky (sending messages or mail, running code, creating automations) waits for a person to approve it, unless you use a direct key. See [approvals](docs/api.md#approvals).
+Most tools run as soon as you call them. Under a browser sign-in or a standard key, two kinds don't:
+
+- **Direct key only:** sending mail or DMs, changing the calendar, calling a connected app's API (`integration_request`, `run_recipe`), running code and compiled automations (`schedule_automation`) are refused with `requires_direct_key`. Use a direct key, or hand the task to `ask_cedric`, which asks a person before anything goes out.
+- **Needs approval:** posting in a channel, moving an event hook and starting a build return `pending_approval` until a person approves.
+
+See [approvals](docs/api.md#approvals).
+
+## What people build with it
+
+- **"What did we decide?" from the editor.** Before touching the pricing code, your coding agent asks `recall_memories` and gets the team's actual decision, not a guess.
+- **Ship and tell.** When a PR merges, the agent writes the summary, `send_channel_message` posts it in #eng once a teammate approves, and `remember` keeps the decision for next time.
+- **CI that speaks up.** A failed deploy calls `/api/v1/chat`: "Tell #eng what broke and open a Linear issue." Cedric drafts both and a teammate approves with one tap.
+- **Settle it with a vote.** `post_vote` asks the channel which name to ship, and `vote_results` brings the tally back to your agent.
+
+More, with the calls spelled out: **[docs/use-cases.md](docs/use-cases.md)**.
 
 ## Use it from code
 
@@ -107,7 +122,7 @@ async with http, streamable_http_client(URL, http_client=http) as (read, write):
         result = await session.call_tool("recall_memories", {"query": "pricing decisions"})
 ```
 
-No agent of your own? One HTTP call runs a whole Cedric turn ([examples/node/chat.mjs](examples/node/chat.mjs), [examples/python/chat.py](examples/python/chat.py)):
+No agent of your own? One HTTP call with an API key runs a whole Cedric turn ([examples/node/chat.mjs](examples/node/chat.mjs), [examples/python/chat.py](examples/python/chat.py)):
 
 ```bash
 curl -X POST https://app.meet-cedric.com/api/v1/chat \
@@ -115,7 +130,7 @@ curl -X POST https://app.meet-cedric.com/api/v1/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Summarize this week for the team"}'
 
-# { "reply": "...", "session": "abc123" }
+# { "reply": "...", "session": "abc123", "outcome": "answered" }
 ```
 
 Chat sessions, file uploads, approvals and limits: **[docs/api.md](docs/api.md)**.
@@ -125,6 +140,7 @@ Chat sessions, file uploads, approvals and limits: **[docs/api.md](docs/api.md)*
 ```
 docs/clients.md          setup for every MCP client, API keys, how the sign-in works
 docs/tools.md            every tool, grouped, with its parameters
+docs/use-cases.md        worked examples of what to build with Cedric
 docs/api.md              MCP, chat and files endpoints, approvals, limits
 examples/node/           MCP SDK client and chat call (TypeScript SDK)
 examples/python/         MCP SDK client and chat call (Python SDK)

@@ -8,9 +8,9 @@ https://app.meet-cedric.com/api/v1/mcp
 
 Give your client that address and sign in once in your browser. From then on the client works in your Cedric workspace as you: the same memory, the same connected apps and the same approvals as chat. No account yet? [Start free](https://app.meet-cedric.com), no card needed.
 
-Two ways in:
+Two ways in, and both work for every client below:
 
-- **Sign in from the client (recommended).** The client opens your browser, you approve once, and it keeps a token that refreshes on its own. Nothing secret to paste.
+- **Sign in from the client (recommended).** The client opens your browser, you approve once, and it keeps a token that refreshes on its own. Nothing secret to paste. A sign-in runs in standard mode, so the tools marked **Direct key only** in [tools.md](tools.md) are refused; hand that work to `ask_cedric`, or use a direct key.
 - **API key (headless).** For scripts, CI and agents with no browser. Create a key in Cedric's **Settings → MCP** and send it as `Authorization: Bearer cedric_sk_...`. See [API keys](#api-keys).
 
 ## Claude Code
@@ -126,7 +126,7 @@ The same header works in any client that accepts custom headers, for example Cur
 }
 ```
 
-Create the key in **Settings → MCP**. A key acts as you. Standard keys ask before anything risky; a direct key runs it immediately, so creating one is the approval and revoking it is the off-switch. Keys are shown once, and only to their owner.
+Create the key in **Settings → MCP**. A key acts as you. A standard key refuses the direct-key-only tools and holds the rest of the risky ones for a person's approval; a direct key runs them all immediately, so creating one is the approval and revoking it is the off-switch. See [approvals](api.md#approvals). A key stays masked in Settings, and only its owner can reveal it.
 
 ## How the sign-in works
 
@@ -147,11 +147,13 @@ You don't need this to connect. It is for anyone building or debugging an MCP cl
 | `/api/oauth/token` | Code exchange and refresh |
 | `/api/oauth/revoke` | Token revocation |
 
-All endpoints are under `https://app.meet-cedric.com`. Redirect URIs must be https, an app scheme, or loopback http. Tokens issued this way always run in standard mode.
+All endpoints are under `https://app.meet-cedric.com`. Redirect URIs must be https, an app scheme, or loopback http. Tokens issued this way always run in standard mode. They work on the MCP server and the file upload; the chat endpoint takes an API key.
 
 ## Troubleshooting
 
-- **A tool came back "pending approval".** That is by design: risky actions wait for a person to approve them in chat or the dashboard. Approve it there, then ask the agent to continue.
+- **A tool came back "pending approval".** That is by design: posting in a channel, moving an event hook and starting a build wait for a person to approve them in chat or the dashboard. Approve it there, then ask the agent to continue.
+- **A tool came back `requires_direct_key`.** Sending mail or DMs, changing the calendar, calling a connected app's API, running code and compiled automations (`schedule_automation`) only run with a direct key. Under a sign-in or a standard key, hand the task to `ask_cedric` instead, or create a direct key in **Settings → MCP**.
+- **A tool says it can't be called through the API.** `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook` only work from chat or the dashboard.
 - **The connection stopped working after a while.** Access tokens expire and a compliant client refreshes on its own. If yours doesn't, sign in again from the client.
 - **You want to cut an agent off.** **Settings → MCP → Connected agents → Disconnect** signs it out everywhere.
 - **Registration or sign-in fails.** Check the address is exactly `https://app.meet-cedric.com/api/v1/mcp`, with https, then check your client's own MCP docs.

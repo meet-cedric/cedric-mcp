@@ -4,18 +4,18 @@ Talk to your Cedric workspace from code: scripts, tests, automations and your ow
 
 Base URL: `https://app.meet-cedric.com`
 
-| Endpoint | What it does |
-| --- | --- |
-| `POST /api/v1/mcp` | MCP server: Cedric's tools for any MCP client or agent |
-| `POST /api/v1/chat` | One request, one whole Cedric turn, reply as JSON |
-| `POST /api/v1/files` | Upload local files (videos, images, documents) |
+| Endpoint | What it does | Takes |
+| --- | --- | --- |
+| `POST /api/v1/mcp` | MCP server: Cedric's tools for any MCP client or agent | Sign-in or API key |
+| `POST /api/v1/chat` | One request, one whole Cedric turn, reply as JSON | API key |
+| `POST /api/v1/files` | Upload local files (videos, images, documents) | Sign-in or API key |
 
 ## Authentication
 
-Two ways in, one permission model.
+Two ways in, one permission model. Use whichever suits the caller; the MCP server takes both.
 
-- **Sign in from your agent (OAuth 2.1 with PKCE).** Any MCP client given the MCP address discovers the sign-in by itself: it registers, opens your browser, you approve once, and it keeps a token that refreshes quietly. Metadata lives at `/.well-known/oauth-authorization-server` and `/.well-known/oauth-protected-resource`. These tokens always run in standard mode. Details in [clients.md](clients.md#how-the-sign-in-works).
-- **API keys.** For scripts, CI and agents with no browser. Keys look like `cedric_sk_...`, are created in **Settings → MCP**, stay masked until their owner reveals them, and revoking one is the whole off-switch.
+- **Sign in from your agent (OAuth 2.1 with PKCE).** Any MCP client given the MCP address discovers the sign-in by itself: it registers, opens your browser, you approve once, and it keeps a token that refreshes quietly. Metadata lives at `/.well-known/oauth-authorization-server` and `/.well-known/oauth-protected-resource`. These tokens always run in standard mode (see [approvals](#approvals)). Details in [clients.md](clients.md#how-the-sign-in-works).
+- **API keys.** For scripts, CI and agents with no browser, and the only way into `/api/v1/chat`. Keys look like `cedric_sk_...`, are created in **Settings → MCP**, stay masked until their owner reveals them, and revoking one is the whole off-switch.
 
 ```
 Authorization: Bearer cedric_sk_...
@@ -56,7 +56,7 @@ With the official MCP SDKs, see [examples/node/mcp-client.mjs](../examples/node/
 
 ## Chat: one endpoint, whole turns
 
-`POST /api/v1/chat` runs a normal Cedric turn, the same as every other surface (memory, connected tools, scheduling and credits all apply), and returns the reply as JSON.
+`POST /api/v1/chat` runs a normal Cedric turn, the same as every other surface (memory, connected tools, scheduling and credits all apply), and returns the reply as JSON. It takes an API key; a message can be up to 8,000 characters.
 
 ```bash
 curl -X POST https://app.meet-cedric.com/api/v1/chat \
@@ -66,8 +66,10 @@ curl -X POST https://app.meet-cedric.com/api/v1/chat \
 ```
 
 ```json
-{ "reply": "...", "session": "abc123" }
+{ "reply": "...", "session": "abc123", "outcome": "answered" }
 ```
+
+`outcome` is usually `answered`. It is `proposal_created` when the turn raised something for a person to approve (a key can raise an approval but never grant one), and `budget_blocked` when the workspace is out of credits. When the turn made files, a `files` list carries each one's `filename` and `url`.
 
 Each key talks in its own conversation by default. Pass `"session": "<key>"` to continue a specific session, or `"session": "new"` to start fresh; the response returns the session key for reuse.
 
@@ -80,7 +82,7 @@ curl -X POST https://app.meet-cedric.com/api/v1/chat \
 
 ## Files: videos, images and documents
 
-A tool call is JSON and has no room for a video, so a file on your machine comes in through `POST /api/v1/files`, with the same key, as multipart form-data: field `files`, up to 5 files per request, 100 MB each. The answer lists each file's `id`. Add `?share=1` to also get a public link.
+A tool call is JSON and has no room for a video, so a file on your machine comes in through `POST /api/v1/files`, with the same key or sign-in token, as multipart form-data: field `files`, up to 5 files per request, 100 MB each. The answer lists each file's `id`. Add `?share=1` to also get a public link.
 
 ```bash
 curl -X POST https://app.meet-cedric.com/api/v1/files \
@@ -96,7 +98,9 @@ curl -X POST https://app.meet-cedric.com/api/v1/files \
 }
 ```
 
-Optional form fields: `keep=1` keeps the file for good, `path=brand/videos` puts it in a folder.
+With `?share=1`, each stored file also carries a `shareUrl`, and its `expiresInDays` becomes 365. A file that could not be stored is listed in `refused` with the reason, and the others still go through.
+
+Optional form fields: `keep=1` keeps the file for good (`expiresInDays` is then `null`), `path=brand/videos` puts it in a folder.
 
 ```bash
 curl -X POST "https://app.meet-cedric.com/api/v1/files?share=1" \
@@ -118,13 +122,18 @@ A workspace holds up to 1 GB. A key sees the files its owner may see.
 
 Keys have a mode, chosen when you create them and fixed after:
 
-- **Standard** (the default, and always the mode for browser sign-ins): anything risky, like sending messages or mail, running code or creating standing automations, raises an approval that a person decides in chat or the dashboard. The call returns `pending_approval` with a proposal id; check it with the `proposal_status` tool.
-- **Direct:** risky actions run immediately. Creating a direct key is the standing approval (you are automating yourself), and revoking it ends everything.
+- **Standard** (the default, and always the mode for browser sign-ins). Most tools run as soon as you call them. Two kinds don't:
+  - **Direct key only:** `gmail_send`, `send_dm`, `calendar_create_event`, `calendar_update_event`, `calendar_delete_event`, `integration_request`, `run_recipe`, `run_code` and `schedule_automation`. The call does nothing and returns `"status": "requires_direct_key"`. Use a direct key, or hand the task to `ask_cedric`: Cedric then raises the action as an approval, the same way chat does.
+  - **Needs approval:** `send_channel_message`, `move_event_hook` and `start_build`. The call returns `"status": "pending_approval"` with a `proposalId`, and a person decides in chat or the dashboard. Check it with the `proposal_status` tool.
+- **Direct:** every one of these runs immediately. Creating a direct key is the standing approval (you are automating yourself), and revoking it ends everything.
+
+Whatever the mode, five tools never run over the API: `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook`. Each would create access wider than the key, so they work only from chat or the dashboard.
 
 ## Limits
 
-- 30 requests per minute per key.
-- Request bodies are capped; long work belongs in sessions.
+- MCP and file uploads: 60 requests per minute per key, shared between the two.
+- Chat: 30 requests per minute per key.
+- A chat message can be up to 8,000 characters; an MCP request body up to 200,000. Long work belongs in sessions.
 - Suspended or out-of-credit workspaces refuse API turns with the same message chat gives.
 - Turns are metered as normal usage; direct tool calls count per call.
 

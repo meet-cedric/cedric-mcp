@@ -7,6 +7,8 @@
   "rules": [
     "Connect to https://app.meet-cedric.com/api/v1/mcp over Streamable HTTP; sign in with OAuth or send Authorization: Bearer cedric_sk_...",
     "Call the getting_started tool first after connecting.",
-    "Risky tools return pending_approval under a standard key; poll proposal_status until a person decides."
+    "Under a sign-in or standard key, gmail_send, send_dm, the calendar write tools, integration_request, run_recipe, run_code and schedule_automation return requires_direct_key; delegate them through ask_cedric or use a direct key.",
+    "send_channel_message, move_event_hook and start_build return pending_approval under a standard key; poll proposal_status until a person decides.",
+    "The chat endpoint /api/v1/chat takes an API key, not a sign-in token."
   ]
 }

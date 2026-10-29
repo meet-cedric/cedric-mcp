@@ -4,6 +4,7 @@
 
 Tools from external MCP servers a workspace connected (names starting
 with "mcp__") are left out: they belong to that workspace, not to Cedric.
+So are the tools the server lists but refuses over the API (BLOCKED).
 """
 
 import json
@@ -28,8 +29,7 @@ GROUPS = [
                               "retire_learning", "set_preference"]),
     ("Chat and channels", ["list_channels", "channel_members", "read_channel", "send_channel_message",
                            "send_dm", "edit_message", "delete_message", "set_channel_privacy",
-                           "ask_with_options", "post_vote", "vote_results", "connect_telegram",
-                           "connect_discord", "connect_whatsapp"]),
+                           "ask_with_options", "post_vote", "vote_results"]),
     ("Meetings", ["join_call", "set_meeting_screen", "share_meeting_notes", "meeting_brief",
                   "list_precall_asks", "answer_precall_ask", "meeting_open_asks", "answer_meeting_question",
                   "approve_card", "dismiss_card", "stop_nudges", "nudge_later", "mark_item_done",
@@ -38,7 +38,7 @@ GROUPS = [
                                               "schedule_automation", "start_workflow", "workflow_checkpoint",
                                               "finish_workflow", "list_workflows", "cancel_workflow",
                                               "send_workflow_event", "watch_app", "list_watches", "stop_watch",
-                                              "create_event_hook", "list_event_hooks", "update_event_hook",
+                                              "list_event_hooks", "update_event_hook",
                                               "delete_event_hook", "move_event_hook", "proposal_status"]),
     ("Web sources", ["watch_source", "list_watched_sources", "unwatch_source", "pull_updates", "pull_metrics"]),
     ("Files", ["list_files", "get_file", "find_shared_files", "upload_file", "read_file", "convert_file",
@@ -54,8 +54,20 @@ GROUPS = [
                          "answer_build_ask", "builds_status", "build_changes"]),
     ("Skills and other MCP servers", ["list_skills", "get_skill", "save_skill", "connect_mcp",
                                       "list_mcp_servers", "disconnect_mcp"]),
-    ("Workspace", ["dashboard_link", "referral_link", "update_task_doc", "archive_task_doc", "send_feedback"]),
+    ("Workspace", ["referral_link", "update_task_doc", "archive_task_doc", "send_feedback"]),
 ]
+
+# Listed by tools/list but refused over the API: each would mint a credential
+# wider than the key (a dashboard session, a new platform door, a public trigger).
+BLOCKED = ["dashboard_link", "connect_telegram", "connect_discord", "connect_whatsapp", "create_event_hook"]
+
+# Refused under a standard key or a browser sign-in (status requires_direct_key);
+# they run only with a direct key. Mirrors the server's side-effect list.
+DIRECT_ONLY = {"gmail_send", "calendar_create_event", "calendar_update_event", "calendar_delete_event",
+               "integration_request", "run_recipe", "send_dm", "run_code", "schedule_automation"}
+
+# The server appends this to the description of a tool that waits for approval.
+APPROVAL_MARK = "(Risky:"
 
 # Wording fixes for the public page (Cedric is "he").
 FIXES = {"what it learns": "what he learns"}
@@ -96,7 +108,8 @@ def params(schema):
 
 
 def main():
-    tools = {t["name"]: t for t in fetch_tools() if not t["name"].startswith("mcp__")}
+    tools = {t["name"]: t for t in fetch_tools()
+             if not t["name"].startswith("mcp__") and t["name"] not in BLOCKED}
     grouped = {n for _, names in GROUPS for n in names}
     missing = sorted(set(tools) - grouped)
     groups = GROUPS + ([("Other", missing)] if missing else [])
@@ -110,9 +123,20 @@ def main():
         "Parameters marked `?` are optional. Call `getting_started` first: it returns the full usage "
         "guide over the wire, and `tools/list` returns each tool's complete input schema.",
         "",
-        "Risky tools (sending messages or mail, running code, creating automations) return "
-        "`pending_approval` under a standard key or browser sign-in, until a person approves. "
-        "See [approvals](api.md#approvals).",
+        "Most tools run as soon as you call them. Two kinds don't, under a standard key or a browser "
+        "sign-in (sign-ins are always standard):",
+        "",
+        "- **Direct key only:** the call is refused with `requires_direct_key` and nothing happens. "
+        "Use a direct key, or hand the task to `ask_cedric`, which asks a person before acting.",
+        "- **Needs approval:** the call returns `pending_approval` with a proposal id until a person "
+        "approves it in chat or the dashboard.",
+        "",
+        "With a direct key, both kinds run immediately. See [approvals](api.md#approvals).",
+        "",
+        "`tools/list` also returns " + ", ".join(f"`{n}`" for n in BLOCKED[:-1])
+        + f" and `{BLOCKED[-1]}`. They are refused over "
+        "the API, because each would create access wider than the key, so they are left out here. "
+        "Use them from chat or the dashboard.",
         "",
         "Generated by `scripts/build-tools-doc.py` from the live `tools/list`.",
         "",
@@ -124,7 +148,10 @@ def main():
         lines += [f"## {title}", "", "| Tool | What it does | Parameters |", "| --- | --- | --- |"]
         for n in present:
             t = tools[n]
-            lines.append(f"| `{n}` | {summary(t.get('description', ''))} | {params(t.get('inputSchema'))} |")
+            desc = t.get("description", "")
+            mark = ("**Direct key only.** " if n in DIRECT_ONLY
+                    else "**Needs approval.** " if APPROVAL_MARK in desc else "")
+            lines.append(f"| `{n}` | {mark}{summary(desc)} | {params(t.get('inputSchema'))} |")
         lines.append("")
     with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines))
