@@ -71,7 +71,7 @@ A few of the [129 tools](docs/tools.md):
 
 Most tools run as soon as you call them. Under a browser sign-in or a standard key, two kinds don't:
 
-- **Direct key only:** sending mail or DMs, changing the calendar, calling a connected app's API (`integration_request`, `run_recipe`), running code and compiled automations (`schedule_automation`) are refused with `requires_direct_key`. Use a direct key, or hand the task to `ask_cedric`, which asks a person before anything goes out.
+- **Direct key only:** sending mail or DMs, changing the calendar, calling a connected app (`integration_request`, `integration_bulk`, `integration_upload`, `run_recipe`), running code and compiled automations (`schedule_automation`) are refused with `requires_direct_key`. Use a direct key, or hand the task to `ask_cedric`, which puts each send on a card in your Action Centre and runs it when you press Send.
 - **Needs approval:** posting in a channel, moving an event hook and starting a build return `pending_approval` until a person approves.
 
 See [approvals](docs/api.md#approvals).

@@ -10,7 +10,7 @@ Give your client that address and sign in once in your browser. From then on the
 
 Two ways in, and both work for every client below:
 
-- **Sign in from the client (recommended).** The client opens your browser, you approve once, and it keeps a token that refreshes on its own. Nothing secret to paste. A sign-in runs in standard mode, so the tools marked **Direct key only** in [tools.md](tools.md) are refused; hand that work to `ask_cedric`, or use a direct key.
+- **Sign in from the client (recommended).** The client opens your browser, you approve once, and it keeps a token that refreshes on its own. Nothing secret to paste. A sign-in runs in standard mode, so the tools marked **Direct key only** in [tools.md](tools.md) are refused; hand that work to `ask_cedric`, which puts each send in your Action Centre for you to approve, or use a direct key.
 - **API key (headless).** For scripts, CI and agents with no browser. Create a key in Cedric's **Settings → MCP** and send it as `Authorization: Bearer cedric_sk_...`. See [API keys](#api-keys).
 
 ## Claude Code
@@ -152,8 +152,10 @@ All endpoints are under `https://app.meet-cedric.com`. Redirect URIs must be htt
 ## Troubleshooting
 
 - **A tool came back "pending approval".** That is by design: posting in a channel, moving an event hook and starting a build wait for a person to approve them in chat or the dashboard. Approve it there, then ask the agent to continue.
-- **A tool came back `requires_direct_key`.** Sending mail or DMs, changing the calendar, calling a connected app's API, running code and compiled automations (`schedule_automation`) only run with a direct key. Under a sign-in or a standard key, hand the task to `ask_cedric` instead, or create a direct key in **Settings → MCP**.
-- **A tool says it can't be called through the API.** `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook` only work from chat or the dashboard.
+- **A tool came back `requires_direct_key`.** Sending mail or DMs, changing the calendar, calling, batching or uploading to a connected app, running code and compiled automations (`schedule_automation`) only run with a direct key. Under a sign-in or a standard key, hand the task to `ask_cedric` instead, or create a direct key in **Settings → MCP**.
+- **Cedric says something is waiting in your Action Centre.** Under a sign-in or a standard key, work handed to `ask_cedric` doesn't send on its own: each email, DM, calendar change or app write waits on a card showing exactly what goes out. Press **Send** there.
+- **A tool you know from chat is missing.** `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook` only work from chat or the dashboard, so `tools/list` leaves them out.
+- **A key stopped working: "no longer in the workspace".** Keys and sign-ins belong to a person, and removing them from the workspace revokes both.
 - **The connection stopped working after a while.** Access tokens expire and a compliant client refreshes on its own. If yours doesn't, sign in again from the client.
 - **You want to cut an agent off.** **Settings → MCP → Connected agents → Disconnect** signs it out everywhere.
 - **Registration or sign-in fails.** Check the address is exactly `https://app.meet-cedric.com/api/v1/mcp`, with https, then check your client's own MCP docs.

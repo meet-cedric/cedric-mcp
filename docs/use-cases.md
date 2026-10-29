@@ -2,7 +2,7 @@
 
 Worked examples of an agent (or a script) using Cedric's tools. Each one names the calls it makes; parameters are in [tools.md](tools.md).
 
-Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; none of these examples need one, and `ask_cedric` covers that work under a sign-in by asking a person first. See [approvals](api.md#approvals).
+Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; none of these examples need one, and `ask_cedric` covers that work under a sign-in: each send waits in your Action Centre until you press Send. See [approvals](api.md#approvals).
 
 ## Check what the team decided before writing code
 
@@ -136,4 +136,4 @@ When the work is open-ended, don't script it. One call, and Cedric plans and use
     "message": "Find every customer who emailed about the outage this week, draft a personal reply to each, and hold them for my approval." } }
 ```
 
-Needs: sign-in. Anything that would send waits for approval.
+Needs: sign-in. Each reply waits in your Action Centre until you press Send.

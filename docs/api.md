@@ -21,7 +21,7 @@ Two ways in, one permission model. Use whichever suits the caller; the MCP serve
 Authorization: Bearer cedric_sk_...
 ```
 
-Neither a key nor a sign-in ever reaches another workspace or outranks its owner: it sees exactly your connections, your memory and this workspace's credits.
+Neither a key nor a sign-in ever reaches another workspace or outranks its owner: it sees exactly your connections, your memory and this workspace's credits. Both belong to a person, so removing someone from the workspace revokes their keys and agent sign-ins.
 
 ## MCP: Cedric's tools for your agent
 
@@ -123,11 +123,17 @@ A workspace holds up to 1 GB. A key sees the files its owner may see.
 Keys have a mode, chosen when you create them and fixed after:
 
 - **Standard** (the default, and always the mode for browser sign-ins). Most tools run as soon as you call them. Two kinds don't:
-  - **Direct key only:** `gmail_send`, `send_dm`, `calendar_create_event`, `calendar_update_event`, `calendar_delete_event`, `integration_request`, `run_recipe`, `run_code` and `schedule_automation`. The call does nothing and returns `"status": "requires_direct_key"`. Use a direct key, or hand the task to `ask_cedric`: Cedric then raises the action as an approval, the same way chat does.
+  - **Direct key only:** `gmail_send`, `send_dm`, `calendar_create_event`, `calendar_update_event`, `calendar_delete_event`, `integration_request`, `integration_bulk`, `integration_upload`, `run_recipe`, `run_code` and `schedule_automation`. The call does nothing and returns `"status": "requires_direct_key"`. Use a direct key, or hand the task to `ask_cedric` (see [work you hand to Cedric](#work-you-hand-to-cedric)).
   - **Needs approval:** `send_channel_message`, `move_event_hook` and `start_build`. The call returns `"status": "pending_approval"` with a `proposalId`, and a person decides in chat or the dashboard. Check it with the `proposal_status` tool.
 - **Direct:** every one of these runs immediately. Creating a direct key is the standing approval (you are automating yourself), and revoking it ends everything.
 
-Whatever the mode, five tools never run over the API: `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook`. Each would create access wider than the key, so they work only from chat or the dashboard.
+### Work you hand to Cedric
+
+An `ask_cedric` call or a `/api/v1/chat` turn under a standard key or a sign-in runs Cedric's reads straight away. Every send and every write to a connected app (email, DMs, calendar changes, app calls, recipes, code, automations) goes on a card in the key owner's **Action Centre** instead of running. The card shows the exact call, and it runs once, when the owner presses **Send**. Cedric's reply says what is waiting there; resending the request does not push it through. With a direct key, the same work runs immediately.
+
+### Never over the API
+
+Whatever the mode, five tools never run over the API, and `tools/list` leaves them out: `dashboard_link`, `connect_telegram`, `connect_discord`, `connect_whatsapp` and `create_event_hook`. Each would create access wider than the key, so they work only from chat or the dashboard. Connecting a tool server for the whole team stays an admin's job in chat or the dashboard: through the API, `connect_mcp` connects one for you only.
 
 ## Limits
 
