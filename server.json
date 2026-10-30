@@ -3,7 +3,7 @@
   "name": "io.github.meet-cedric/cedric",
   "title": "Cedric",
   "description": "AI employee for your team chat: memory, connected apps, meetings, files and scheduling.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "websiteUrl": "https://meet-cedric.com",
   "repository": {
     "url": "https://github.com/meet-cedric/cedric-mcp",

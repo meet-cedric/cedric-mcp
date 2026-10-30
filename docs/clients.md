@@ -77,6 +77,14 @@ codex mcp login cedric
 
 ## Gemini CLI
 
+Install the Cedric extension, which adds the server and a short guide for the model:
+
+```bash
+gemini extensions install https://github.com/meet-cedric/cedric-mcp
+```
+
+Or add only the server:
+
 ```bash
 gemini mcp add --transport http cedric https://app.meet-cedric.com/api/v1/mcp
 ```

@@ -1,0 +1,11 @@
+{
+  "name": "cedric",
+  "version": "2.0.1",
+  "description": "Cedric, the AI employee for your team chat: memory, connected apps, meetings, files and scheduling.",
+  "mcpServers": {
+    "cedric": {
+      "httpUrl": "https://app.meet-cedric.com/api/v1/mcp"
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}
