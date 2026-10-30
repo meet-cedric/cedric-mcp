@@ -8,4 +8,5 @@ Cedric is the AI employee that lives in a team's chat (Slack, Telegram, Discord)
 - Work handed to `ask_cedric` never sends on its own: each email, DM, calendar change or app write waits on a card in the user's Action Centre until they press Send. Tell the user, and don't resend the request.
 - `send_channel_message`, `move_event_hook` and `start_build` return `pending_approval`. Check `proposal_status` until a person decides.
 
-Docs: https://github.com/meet-cedric/cedric-mcp
+Website: https://meet-cedric.com
+Docs: https://github.com/meet-cedric/cedric-mcp and https://meet-cedric.com/docs

@@ -124,6 +124,8 @@ A workspace holds up to 1 GB. A key sees the files its owner may see.
 
 ## Approvals
 
+The product side, in plain words: [how approvals work](https://meet-cedric.com/docs/how-approvals-work).
+
 Keys have a mode, chosen when you create them and fixed after:
 
 - **Standard** (the default, and always the mode for browser sign-ins). Most tools run as soon as you call them. Two kinds don't:

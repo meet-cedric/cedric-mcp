@@ -2,11 +2,11 @@
 
 Worked examples of an agent (or a script) using Cedric's tools. Each one names the calls it makes; parameters are in [tools.md](tools.md).
 
-Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; only one example below needs one, and `ask_cedric` covers that work under a sign-in: each send waits in your Action Centre until you press Send. See [approvals](api.md#approvals).
+Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; only one example below needs one, and `ask_cedric` covers that work under a sign-in: each send waits in your Action Centre until you press Send. See [approvals](api.md#approvals) and [how approvals work](https://meet-cedric.com/docs/how-approvals-work).
 
 ## Check what the team decided before writing code
 
-Your coding agent is about to change the pricing logic. Before it guesses, it asks the team's memory, then saves the new decision once it is made.
+Your coding agent is about to change the pricing logic. Before it guesses, it asks the team's memory, then saves the new decision once it is made. How Cedric keeps it: [the company brain](https://meet-cedric.com/docs/the-company-brain).
 
 ```json
 { "name": "recall_memories", "arguments": { "query": "annual plan discount decision" } }
@@ -77,7 +77,7 @@ Needs: an API key (chat takes keys).
 
 ## Meeting prep without leaving the terminal
 
-Turn on the pre-meeting brief, send Cedric into the call, and share the notes after.
+Turn on the pre-meeting brief, send Cedric into the call, and share the notes after. What he does in a call: [Cedric in meetings](https://meet-cedric.com/docs/cedric-in-meetings).
 
 ```json
 { "name": "meeting_brief", "arguments": { "on": true } }
@@ -103,7 +103,7 @@ Needs: sign-in.
 
 ## Monday metrics, set up once
 
-Schedule a standing job and Cedric runs it every week in the workspace, long after your agent's session has ended.
+Schedule a standing job and Cedric runs it every week in the workspace, long after your agent's session has ended. More in [recurring work and automations](https://meet-cedric.com/docs/recurring-work-and-automations).
 
 ```json
 { "name": "schedule_task", "arguments": {
@@ -224,3 +224,7 @@ When the work is open-ended, don't script it. One call, and Cedric plans and use
 ```
 
 Needs: sign-in. Each reply waits in your Action Centre until you press Send.
+
+## More
+
+The same work from chat instead of code: [use cases](https://meet-cedric.com/use-cases), [ready-made agents](https://meet-cedric.com/agent-gallery) and the [apps Cedric connects to](https://meet-cedric.com/integrations).

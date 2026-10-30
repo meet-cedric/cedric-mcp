@@ -14,7 +14,7 @@
   <a href="https://app.meet-cedric.com">Start free</a>
 </p>
 
-[Cedric](https://meet-cedric.com) is an AI employee for Slack, Telegram and Discord. He joins your meetings, works in the tools you connect (HubSpot, Notion, Gmail, Google Calendar, Linear, GitHub, Stripe and 3,000+ more) and asks before anything is sent or changed.
+[Cedric](https://meet-cedric.com) is an AI employee for Slack, Telegram and Discord. He [joins your meetings](https://meet-cedric.com/docs/cedric-in-meetings), works in the tools you connect ([HubSpot](https://meet-cedric.com/integrations/hubspot), [Notion](https://meet-cedric.com/integrations/notion), [Gmail](https://meet-cedric.com/integrations/gmail), [Google Calendar](https://meet-cedric.com/integrations/google-calendar), [Linear](https://meet-cedric.com/integrations/linear), [GitHub](https://meet-cedric.com/integrations/github), [Stripe](https://meet-cedric.com/integrations/stripe) and [3,000+ more](https://meet-cedric.com/integrations)) and [asks before anything is sent or changed](https://meet-cedric.com/docs/how-approvals-work).
 
 This repo is how you reach him from code. Cedric is a remote MCP server, so Claude Code, Cursor, VS Code, Claude, ChatGPT, Codex CLI, Gemini CLI, Windsurf or your own agent can use his 129 tools: team memory, channels, connected apps, meetings, files, workflows and scheduling. Your agent is the brain; Cedric is the hands.
 
@@ -77,7 +77,7 @@ Most tools run as soon as you call them. Under a browser sign-in or a standard k
 - **Direct key only:** sending mail or DMs, changing the calendar, calling a connected app (`integration_request`, `integration_bulk`, `integration_upload`, `run_recipe`), running code and compiled automations (`schedule_automation`) are refused with `requires_direct_key`. Use a direct key, or hand the task to `ask_cedric`, which puts each send on a card in your Action Centre and runs it when you press Send.
 - **Needs approval:** posting in a channel, moving an event hook and starting a build return `pending_approval` until a person approves.
 
-See [approvals](docs/api.md#approvals).
+See [approvals](docs/api.md#approvals), and [how approvals work](https://meet-cedric.com/docs/how-approvals-work) in the product.
 
 ## What people build with it
 
@@ -89,7 +89,7 @@ See [approvals](docs/api.md#approvals).
 - **A launch board the team can move.** `board` turns the plan into a link anyone can open and move cards on, and reads it back later to see what moved.
 - **Numbers into a deck.** `create_presentation` turns the quarter's figures into a real PowerPoint file, ready to post in a channel.
 
-More, with the calls spelled out: **[docs/use-cases.md](docs/use-cases.md)**.
+More, with the calls spelled out: **[docs/use-cases.md](docs/use-cases.md)**. What teams use Cedric for day to day: [use cases](https://meet-cedric.com/use-cases) and [ready-made agents](https://meet-cedric.com/agent-gallery).
 
 ## Use it from code
 
@@ -156,11 +156,25 @@ server.json              the MCP Registry entry
 
 ## Links
 
-- Website: [meet-cedric.com](https://meet-cedric.com)
+- Website: [Cedric, the AI employee for your team chat](https://meet-cedric.com)
 - Docs: [meet-cedric.com/docs](https://meet-cedric.com/docs)
-- Connect other MCP servers to Cedric: [bring your own tools](https://meet-cedric.com/docs/bring-your-own-tools)
+  - [How approvals work](https://meet-cedric.com/docs/how-approvals-work)
+  - [Connecting your tools](https://meet-cedric.com/docs/connecting-your-tools)
+  - [Cedric in meetings](https://meet-cedric.com/docs/cedric-in-meetings)
+  - [The company brain](https://meet-cedric.com/docs/the-company-brain)
+  - [Recurring work and automations](https://meet-cedric.com/docs/recurring-work-and-automations)
+  - [Workflows that wait](https://meet-cedric.com/docs/workflows-that-wait)
+  - [Skills](https://meet-cedric.com/docs/skills)
+  - [Bring your own tools](https://meet-cedric.com/docs/bring-your-own-tools): connect other MCP servers to Cedric
+- Integrations: [every app Cedric works in](https://meet-cedric.com/integrations)
+- Use cases: [what teams hand to Cedric](https://meet-cedric.com/use-cases), and by team: [startups](https://meet-cedric.com/for/startups), [agencies](https://meet-cedric.com/for/agencies), [consultancies](https://meet-cedric.com/for/consultancies)
+- Agent gallery: [ready-made agents](https://meet-cedric.com/agent-gallery)
+- Comparisons: [Cedric next to other AI assistants](https://meet-cedric.com/comparisons)
+- Blog: [meet-cedric.com/blog](https://meet-cedric.com/blog)
+- Changelog: [what shipped](https://meet-cedric.com/changelog)
 - Pricing: [meet-cedric.com/pricing](https://meet-cedric.com/pricing)
 - Security: [meet-cedric.com/security](https://meet-cedric.com/security)
+- Privacy: [meet-cedric.com/privacy](https://meet-cedric.com/privacy)
 - Contact: sales@meet-cedric.com
 
 Cedric is built in Zurich, Switzerland, by SFF Studio. The examples and docs in this repo are MIT licensed; the Cedric service itself is not open source.

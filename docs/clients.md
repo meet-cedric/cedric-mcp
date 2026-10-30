@@ -6,7 +6,7 @@ Cedric is a remote MCP server at one address:
 https://app.meet-cedric.com/api/v1/mcp
 ```
 
-Give your client that address and sign in once in your browser. From then on the client works in your Cedric workspace as you: the same memory, the same connected apps and the same approvals as chat. No account yet? [Start free](https://app.meet-cedric.com), no card needed.
+Give your client that address and sign in once in your browser. From then on the client works in your Cedric workspace as you: the same memory, the same [connected apps](https://meet-cedric.com/integrations) and the same [approvals](https://meet-cedric.com/docs/how-approvals-work) as chat. No account yet? [Start free](https://app.meet-cedric.com), no card needed.
 
 Two ways in, and both work for every client below:
 
