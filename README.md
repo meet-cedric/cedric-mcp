@@ -68,6 +68,9 @@ A few of the [129 tools](docs/tools.md):
 | Meetings | `join_call`, `share_meeting_notes`, `meeting_brief` |
 | Schedules and workflows | `schedule_task`, `start_workflow`, `watch_app`, `watch_source` |
 | Files and documents | `upload_file`, `read_file`, `create_document`, `create_presentation`, `create_spreadsheet` |
+| Boards, forms and pages | `board`, `query_records`, `create_form`, `create_page`, `create_chart_page` |
+
+Every tool carries a title and the standard read-only and destructive labels in `tools/list`, so your client can tell a read from a write before calling.
 
 Most tools run as soon as you call them. Under a browser sign-in or a standard key, two kinds don't:
 
@@ -80,8 +83,11 @@ See [approvals](docs/api.md#approvals).
 
 - **"What did we decide?" from the editor.** Before touching the pricing code, your coding agent asks `recall_memories` and gets the team's actual decision, not a guess.
 - **Ship and tell.** When a PR merges, the agent writes the summary, `send_channel_message` posts it in #eng once a teammate approves, and `remember` keeps the decision for next time.
-- **CI that speaks up.** A failed deploy calls `/api/v1/chat`: "Tell #eng what broke and open a Linear issue." Cedric drafts both and a teammate approves with one tap.
+- **CI that speaks up.** A failed deploy calls `/api/v1/chat`: "Tell #eng what broke and open a Linear issue." Cedric drafts both; the post waits for a teammate's approval and the issue waits in your Action Centre.
 - **Settle it with a vote.** `post_vote` asks the channel which name to ship, and `vote_results` brings the tally back to your agent.
+- **Find a slot and book it.** `calendar_free_busy` finds when everyone is free and `calendar_create_event` sends the invites with a video link (with a direct key, or through `ask_cedric` for one tap in your Action Centre).
+- **A launch board the team can move.** `board` turns the plan into a link anyone can open and move cards on, and reads it back later to see what moved.
+- **Numbers into a deck.** `create_presentation` turns the quarter's figures into a real PowerPoint file, ready to post in a channel.
 
 More, with the calls spelled out: **[docs/use-cases.md](docs/use-cases.md)**.
 

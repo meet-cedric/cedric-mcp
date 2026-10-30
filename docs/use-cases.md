@@ -2,7 +2,7 @@
 
 Worked examples of an agent (or a script) using Cedric's tools. Each one names the calls it makes; parameters are in [tools.md](tools.md).
 
-Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; none of these examples need one, and `ask_cedric` covers that work under a sign-in: each send waits in your Action Centre until you press Send. See [approvals](api.md#approvals).
+Each example also says what it needs. **Sign-in** means it works with a browser sign-in or any API key. Some tools only run with a direct key; only one example below needs one, and `ask_cedric` covers that work under a sign-in: each send waits in your Action Centre until you press Send. See [approvals](api.md#approvals).
 
 ## Check what the team decided before writing code
 
@@ -63,7 +63,7 @@ Needs: sign-in. Votes post in Slack.
 
 ## CI that speaks up
 
-A deploy fails at 2 a.m. The CI job makes one chat call; Cedric reads the context, drafts the message and the issue, and a teammate approves them with one tap in the morning.
+A deploy fails at 2 a.m. The CI job makes one chat call; Cedric reads the context and drafts the message and the issue. Nothing goes out at night: the post waits for a teammate's approval in chat, and the Linear issue waits on a card in the key owner's Action Centre until they press Send.
 
 ```bash
 curl -X POST https://app.meet-cedric.com/api/v1/chat \
@@ -71,7 +71,7 @@ curl -X POST https://app.meet-cedric.com/api/v1/chat \
   -d '{"message": "The prod deploy failed at the migrate step (log below). Tell #eng what broke and open a Linear issue for it.\n\n..."}'
 ```
 
-The reply comes back with `"outcome": "proposal_created"` when Cedric raised something for approval.
+The reply comes back with `"outcome": "proposal_created"` when Cedric raised a post for approval, and its text says what waits in the Action Centre. With a direct key, both go out at once.
 
 Needs: an API key (chat takes keys).
 
@@ -124,6 +124,93 @@ Make a short spoken interview, share the link, and read the transcripts when peo
     "max_minutes": 5 } }
 { "name": "get_voice_interview_results", "arguments": { "interview_id": "..." } }
 ```
+
+Needs: sign-in.
+
+## Find a slot and book it
+
+Your agent finds when everyone is free, then books the meeting with a video link and sends the invites.
+
+```json
+{ "name": "calendar_free_busy", "arguments": {
+    "time_min": "2026-11-03T08:00:00+01:00", "time_max": "2026-11-05T18:00:00+01:00",
+    "emails": ["ana@example.com", "tom@example.com"] } }
+{ "name": "calendar_create_event", "arguments": {
+    "title": "Q4 roadmap review",
+    "start": "2026-11-04T14:00:00+01:00", "end": "2026-11-04T14:45:00+01:00",
+    "attendees": ["ana@example.com", "tom@example.com"], "video": true, "confirmed": true } }
+```
+
+Times need a UTC offset. Busy blocks come back without titles.
+
+Needs: a direct key for the booking. Under a sign-in, ask `ask_cedric` to book it instead, and the invite waits in your Action Centre until you press Send.
+
+## Collect answers with a form
+
+The agent needs everyone's input before the offsite. One call makes a form with a personal link for each person; the answers come back to the agent.
+
+```json
+{ "name": "create_form", "arguments": {
+    "title": "Offsite: what should we cover?",
+    "fields": [
+      { "key": "topic", "label": "The one topic we must cover", "type": "text", "required": true },
+      { "key": "format", "label": "Preferred format", "type": "select", "options": ["Talks", "Workshops", "Mixed"] },
+      { "key": "notes", "label": "Anything else", "type": "textarea" } ],
+    "recipients": [ { "key": "ana", "name": "Ana" }, { "key": "tom", "name": "Tom" } ],
+    "closes_at": "2026-11-07T18:00:00+01:00" } }
+{ "name": "list_form_submissions", "arguments": { "form_id": "..." } }
+```
+
+Share the links in a channel or a DM. Each answer also fires a workflow event, so a form paired with `start_workflow` (pass the run in `run_id`) wakes that workflow as answers arrive.
+
+Needs: sign-in.
+
+## A launch board the team can move
+
+Your agent turns a launch plan into a board anyone with the link can open, move cards on and add to. Later it reads the board back to see what moved.
+
+```json
+{ "name": "board", "arguments": {
+    "action": "create", "title": "November launch",
+    "columns": ["Todo", "Doing", "Done"],
+    "cards": [
+      { "title": "Final pricing page copy", "column": "Doing", "assignee": "Ana", "due": "2026-11-10" },
+      { "title": "Launch email", "column": "Todo", "assignee": "Tom", "due": "2026-11-12" },
+      { "title": "Demo video", "column": "Todo" } ] } }
+{ "name": "board", "arguments": { "action": "read", "board_id": "..." } }
+```
+
+`query_records` filters and groups the cards ("everything due this week, by assignee"), for a status line in your agent's own report.
+
+Needs: sign-in.
+
+## Turn numbers into a deck
+
+Your agent has the quarter's figures. One call turns them into a real PowerPoint file, ready to share.
+
+```json
+{ "name": "create_presentation", "arguments": {
+    "title": "Q3 in review",
+    "slides": [
+      { "title": "Q3 in review", "body": "Sales and product, July to September" },
+      { "title": "Revenue", "bullets": ["MRR up 18% to $84k", "Net revenue retention 112%", "Three new enterprise accounts"] },
+      { "title": "Next quarter", "bullets": ["Self-serve annual plans", "EU data residency", "Hire two account executives"] } ] } }
+```
+
+A first slide without bullets becomes the cover. `create_spreadsheet`, `create_document` (PDF) and `create_chart_page` (a web page of charts and headline figures) work the same way. Every file comes back with an id you can post with `send_channel_message`.
+
+Needs: sign-in.
+
+## Bring your own tools
+
+Connect another MCP server to Cedric once, and its tools sit next to his for every later call, from your agent and from chat.
+
+```json
+{ "name": "connect_mcp", "arguments": {
+    "url": "https://mcp.example.com/mcp", "token": "...", "name": "Example CRM" } }
+```
+
+Cedric checks the server before saving it. Its tools then show up in `tools/list` as `mcp__<key>__<tool>`, with the labels that server gives them. Over the API a server is connected for you only; connecting one for the whole team is an admin's job in chat or the dashboard. See [bring your own tools](https://meet-cedric.com/docs/bring-your-own-tools).
 
 Needs: sign-in.
 

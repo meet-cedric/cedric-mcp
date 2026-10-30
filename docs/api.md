@@ -54,6 +54,10 @@ curl -X POST https://app.meet-cedric.com/api/v1/mcp \
 
 With the official MCP SDKs, see [examples/node/mcp-client.mjs](../examples/node/mcp-client.mjs) and [examples/python/mcp_client.py](../examples/python/mcp_client.py).
 
+Every tool in `tools/list` carries a `title` and the standard behaviour labels in `annotations`: `readOnlyHint` (changes nothing), `destructiveHint` (can delete or overwrite), `idempotentHint` (the same call again has no further effect) and `openWorldHint` (reaches outside Cedric: mail, calendar, chat, connected apps, the web, or a public link). Clients can use them to tell a read from a write before calling. [tools.md](tools.md) shows the same labels as the Effect column.
+
+Tools from MCP servers your workspace connected to Cedric are listed too, as `mcp__<key>__<tool>`, with the labels their own server gives them (or, when it gives none, labels read from the name, counting anything that is not plainly a read as able to delete or overwrite). A file a tool makes comes back with its `id` and a link, ready for `send_channel_message`, `get_file` or `manage_file`.
+
 ## Chat: one endpoint, whole turns
 
 `POST /api/v1/chat` runs a normal Cedric turn, the same as every other surface (memory, connected tools, scheduling and credits all apply), and returns the reply as JSON. It takes an API key; a message can be up to 8,000 characters.
@@ -129,7 +133,7 @@ Keys have a mode, chosen when you create them and fixed after:
 
 ### Work you hand to Cedric
 
-An `ask_cedric` call or a `/api/v1/chat` turn under a standard key or a sign-in runs Cedric's reads straight away. Every send and every write to a connected app (email, DMs, calendar changes, app calls, recipes, code, automations) goes on a card in the key owner's **Action Centre** instead of running. The card shows the exact call, and it runs once, when the owner presses **Send**. Cedric's reply says what is waiting there; resending the request does not push it through. With a direct key, the same work runs immediately.
+An `ask_cedric` call or a `/api/v1/chat` turn under a standard key or a sign-in runs Cedric's reads straight away. Every send and every write to a connected app (email, DMs, calendar changes, app calls, recipes, code, automations, and also file deletes and workspace profile edits) goes on a card in the key owner's **Action Centre** instead of running. The card shows the exact call, and it runs once, when the owner presses **Send**. Cedric's reply says what is waiting there; resending the request does not push it through. With a direct key, the same work runs immediately.
 
 ### Never over the API
 
