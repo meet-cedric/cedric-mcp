@@ -149,4 +149,4 @@ Whatever the mode, five tools never run over the API, and `tools/list` leaves th
 - Suspended or out-of-credit workspaces refuse API turns with the same message chat gives.
 - Turns are metered as normal usage; direct tool calls count per call.
 
-Questions or a missing endpoint? Write to sales@meet-cedric.com.
+Questions or a missing endpoint? Write to ben@meet-cedric.com.

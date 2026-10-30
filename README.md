@@ -175,6 +175,6 @@ server.json              the MCP Registry entry
 - Pricing: [meet-cedric.com/pricing](https://meet-cedric.com/pricing)
 - Security: [meet-cedric.com/security](https://meet-cedric.com/security)
 - Privacy: [meet-cedric.com/privacy](https://meet-cedric.com/privacy)
-- Contact: sales@meet-cedric.com
+- Contact: ben@meet-cedric.com
 
 Cedric is built in Zurich, Switzerland, by SFF Studio. The examples and docs in this repo are MIT licensed; the Cedric service itself is not open source.
